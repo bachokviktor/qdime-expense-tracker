@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyo
+*.pyc
+*.pyd
+
+# Environment
+venv/
+.env
+
+# Django
+*.log
+media/
+staticfiles/
+
+# Emacs
+*~
