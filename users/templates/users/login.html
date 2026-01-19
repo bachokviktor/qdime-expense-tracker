@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% load crispy_forms_tags %}
+
+{% block title %}
+  Login
+{% endblock %}
+
+{% block content %}
+  <form action="{% url 'users:login' %}" method="post">
+    {% csrf_token %}
+    {{ form | crispy }}
+    <input name="next" type="hidden" value="{{ request.GET.next }}"/>
+    <p>Don't have an account? <a href="{% url 'users:registration' %}">Registration</a></p>
+    <button class="btn btn-success" type="submit">Login</button>
+  </form>
+{% endblock %}
