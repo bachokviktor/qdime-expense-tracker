@@ -6,4 +6,51 @@
 
 {% block content %}
   <h1>Welcome, {{ user.username }}</h1>
+  <a href="{% url 'expenses:add_expense' %}" class="btn btn-primary">Add Expense</a>
+  <a href="{% url 'expenses:add_income' %}" class="btn btn-primary">Add Income</a>
+
+  <div class="row">
+    <div class="col-md-6">
+      <h3>Expenses</h3>
+      {% for expense in user_expenses %}
+	<div class="card mb-3">
+	  <div class="card-body">
+	    <div class="row">
+	      <div class="col">
+		<h5 class="card-title"><span style="color: red;">-{{ expense.amount }}</span> {{ expense.category }}</h5>
+		<p class="card-text">{{ expense.date }}</p>
+	      </div>
+	      <div class="col-md-auto">
+		<div class="d-grid gap-2 d-md-block">
+		  <a href="{% url 'expenses:edit_expense' expense_id=expense.id %}" class="btn btn-primary">Edit</a>
+		  <a href="{% url 'expenses:delete_expense' expense_id=expense.id %}" class="btn btn-danger">Delete</a>
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      {% endfor %}
+    </div>
+    <div class="col-md-6">
+      <h3>Incomes</h3>
+      {% for income in user_incomes %}
+	<div class="card mb-3">
+	  <div class="card-body">
+	    <div class="row">
+	      <div class="col">
+		<h5 class="card-title"><span style="color: green;">+{{ income.amount }}</span> {{ income.category }}</h5>
+		<p class="card-text">{{ income.date }}</p>
+	      </div>
+	      <div class="col-md-auto">
+		<div class="d-grid gap-2 d-md-block">
+		  <a href="{% url 'expenses:edit_income' income_id=income.id %}" class="btn btn-primary">Edit</a>
+		  <a href="{% url 'expenses:delete_income' income_id=income.id %}" class="btn btn-danger">Delete</a>
+		</div>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+      {% endfor %}
+    </div>
+  </div>
 {% endblock %}

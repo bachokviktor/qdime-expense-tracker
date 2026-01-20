@@ -15,13 +15,15 @@ class Expense(models.Model):
     }
 
     amount = models.DecimalField(max_digits=8, decimal_places=2)
-    note = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     category = models.CharField(choices=EXPENSE_CATEGORIES)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"-{self.amount}: {self.note[:10]}..."
+        return f"-{self.amount}: {self.category}"
+
+    class Meta:
+        ordering = ["date"]
 
 class Income(models.Model):
     INCOME_CATEGORIES = {
@@ -30,10 +32,12 @@ class Income(models.Model):
     }
 
     amount = models.DecimalField(max_digits=8, decimal_places=2)
-    note = models.CharField(max_length=100)
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None)
     category = models.CharField(choices=INCOME_CATEGORIES)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"+{self.amount}: {self.note[:10]}..."
+        return f"+{self.amount}: {self.category}"
+
+    class Meta:
+        ordering = ["date"]

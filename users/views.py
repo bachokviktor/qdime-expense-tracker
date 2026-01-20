@@ -4,6 +4,8 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from expenses.models import Expense, Income
+
 
 # Create your views here.
 class ProfileView(LoginRequiredMixin, View):
@@ -11,7 +13,10 @@ class ProfileView(LoginRequiredMixin, View):
     template_name = "users/profile.html"
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        user_expenses = Expense.objects.filter(user=request.user).reverse()
+        user_incomes = Income.objects.filter(user=request.user).reverse()
+        
+        return render(request, self.template_name, {"user_expenses": user_expenses, "user_incomes": user_incomes})
 
 
 class LoginView(View):
