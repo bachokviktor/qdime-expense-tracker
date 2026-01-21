@@ -8,43 +8,46 @@ from . import forms, models
 # Create your views here.
 class AddExpenseView(LoginRequiredMixin, View):
     login_url = "users:login"
-    template_name = "expenses/add_expense.html"
+    template_name = "expenses/add.html"
+    instance_type = "expense"
 
     def get(self, request, *args, **kwargs):
         form = forms.ExpenseForm()
 
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form})
 
     def post(self, request, *args, **kwargs):
         form = forms.ExpenseForm(request.POST)
 
         if form.is_valid():
             instance = form.save(commit=False)
+            instance.type = models.Transaction.TYPE_EXPENSE
             instance.user = request.user
             instance.save()
 
             return redirect("users:profile")
 
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form})
 
 
 class EditExpenseView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = "users:login"
-    template_name = "expenses/edit_expense.html"
+    template_name = "expenses/edit.html"
+    instance_type = "expense"
 
     def test_func(self):
-        instance = models.Expense.objects.get(id=self.kwargs["expense_id"])
+        instance = models.Transaction.objects.get(id=self.kwargs["transaction_id"])
 
         return self.request.user == instance.user
 
-    def get(self, request, expense_id, *args, **kwargs):
-        instance = models.Expense.objects.get(id=expense_id)
+    def get(self, request, transaction_id, *args, **kwargs):
+        instance = models.Transaction.objects.get(id=transaction_id)
         form = forms.ExpenseForm(instance=instance)
 
-        return render(request, self.template_name, {"form": form, "expense_id": expense_id})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form, "transaction_id": transaction_id})
 
-    def post(self, request, expense_id, *args, **kwargs):
-        instance = models.Expense.objects.get(id=expense_id)
+    def post(self, request, transaction_id, *args, **kwargs):
+        instance = models.Transaction.objects.get(id=transaction_id)
         form = forms.ExpenseForm(request.POST, instance=instance)
 
         if form.is_valid():
@@ -52,63 +55,51 @@ class EditExpenseView(LoginRequiredMixin, UserPassesTestMixin, View):
 
             return redirect("users:profile")
 
-        return render(request, self.template_name, {"form": form, "expense_id": expense_id})
-
-
-class DeleteExpenseView(LoginRequiredMixin, UserPassesTestMixin, View):
-    login_url = "users:login"
-
-    def test_func(self):
-        instance = models.Expense.objects.get(id=self.kwargs["expense_id"])
-
-        return self.request.user == instance.user
-
-    def get(self, request, expense_id, *args, **kwargs):
-        instance = models.Expense.objects.get(id=expense_id)
-        instance.delete()
-
-        return redirect("users:profile")
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form, "transaction_id": transaction_id})
 
 
 class AddIncomeView(LoginRequiredMixin, View):
     login_url = "users:login"
-    template_name = "expenses/add_income.html"
+    template_name = "expenses/add.html"
+    instance_type = "income"
 
     def get(self, request, *args, **kwargs):
         form = forms.IncomeForm()
 
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form})
 
     def post(self, request, *args, **kwargs):
         form = forms.IncomeForm(request.POST)
 
         if form.is_valid():
             instance = form.save(commit=False)
+            instance.type = models.Transaction.TYPE_INCOME
             instance.user = request.user
             instance.save()
 
             return redirect("users:profile")
 
-        return render(request, self.template_name, {"form": form})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form})
 
 
 class EditIncomeView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = "users:login"
-    template_name = "expenses/edit_income.html"
+    template_name = "expenses/edit.html"
+    instance_type = "income"
 
     def test_func(self):
-        instance = models.Income.objects.get(id=self.kwargs["income_id"])
+        instance = models.Transaction.objects.get(id=self.kwargs["transaction_id"])
 
         return self.request.user == instance.user
 
-    def get(self, request, income_id, *args, **kwargs):
-        instance = models.Income.objects.get(id=income_id)
+    def get(self, request, transaction_id, *args, **kwargs):
+        instance = models.Transaction.objects.get(id=transaction_id)
         form = forms.IncomeForm(instance=instance)
 
-        return render(request, self.template_name, {"form": form, "income_id": income_id})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form, "transaction_id": transaction_id})
 
-    def post(self, request, income_id, *args, **kwargs):
-        instance = models.Income.objects.get(id=income_id)
+    def post(self, request, transaction_id, *args, **kwargs):
+        instance = models.Transaction.objects.get(id=transaction_id)
         form = forms.IncomeForm(request.POST, instance=instance)
 
         if form.is_valid():
@@ -116,19 +107,19 @@ class EditIncomeView(LoginRequiredMixin, UserPassesTestMixin, View):
 
             return redirect("users:profile")
 
-        return render(request, self.template_name, {"form": form, "income_id": income_id})
+        return render(request, self.template_name, {"instance_type": self.instance_type, "form": form, "transaction_id": transaction_id})
 
 
-class DeleteIncomeView(LoginRequiredMixin, UserPassesTestMixin, View):
+class DeleteView(LoginRequiredMixin, UserPassesTestMixin, View):
     login_url = "users:login"
 
     def test_func(self):
-        instance = models.Income.objects.get(id=self.kwargs["income_id"])
+        instance = models.Transaction.objects.get(id=self.kwargs["transaction_id"])
 
         return self.request.user == instance.user
 
-    def get(self, request, income_id, *args, **kwargs):
-        instance = models.Income.objects.get(id=income_id)
+    def get(self, request, transaction_id, *args, **kwargs):
+        instance = models.Transaction.objects.get(id=transaction_id)
         instance.delete()
 
         return redirect("users:profile")
