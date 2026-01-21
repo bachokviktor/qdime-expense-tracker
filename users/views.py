@@ -3,6 +3,10 @@ from django.views import View
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Sum, FloatField
+from django.db.models.functions import Coalesce
+
+from expenses.models import Transaction
 
 
 # Create your views here.
@@ -11,7 +15,19 @@ class ProfileView(LoginRequiredMixin, View):
     template_name = "users/profile.html"
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        user_transactions = Transaction.objects.filter(user=request.user)
+
+        user_income = user_transactions.filter(type="IN").aggregate(sum=Coalesce(Sum("amount", output_field=FloatField()), float(0)))
+        user_expense = user_transactions.filter(type="EX").aggregate(sum=Coalesce(Sum("amount", output_field=FloatField()), float(0)))
+
+        user_balance = user_income["sum"] - user_expense["sum"]
+
+        category_values = user_transactions.filter(type="EX").values("category").annotate(sum=Sum("amount"))
+
+        category_labels = [i["category"] for i in category_values]
+        category_data = [float(i["sum"]) for i in category_values]
+
+        return render(request, self.template_name, {"user_transactions": user_transactions, "user_balance": user_balance, "category_labels": category_labels, "category_data": category_data})
 
 
 class LoginView(View):

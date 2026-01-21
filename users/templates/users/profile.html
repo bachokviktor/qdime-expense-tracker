@@ -5,5 +5,74 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Welcome, {{ user.username }}</h1>
+  <div class="row">
+    <div class="col">
+      <h1>Welcome, {{ user.username }}</h1>
+      <p>Balance: {{ user_balance }}</p>
+      <a href="{% url 'expenses:add_expense' %}" class="btn btn-primary">Add Expense</a>
+      <a href="{% url 'expenses:add_income' %}" class="btn btn-primary">Add Income</a>
+    </div>
+    <div class="col">
+      <div class="chart-container" style="position: relative; height:40vh;">
+	<canvas id="expenses_pie_chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <h3>Transactions</h3>
+  {% for transaction in user_transactions %}
+    <div class="card mb-3">
+      <div class="card-body">
+	<div class="row">
+	  <div class="col">
+	    {% if transaction.type == "EX" %}
+	      <h5 class="card-title"><span style="color: red;">-{{ transaction.amount }}</span> {{ transaction.category }}</h5>
+	    {% else %}
+	      <h5 class="card-title"><span style="color: green;">+{{ transaction.amount }}</span> {{ transaction.category }}</h5>
+	    {% endif %}
+	    <p class="card-text">{{ transaction.date }}</p>
+	  </div>
+	  <div class="col-md-auto">
+	    <div class="d-grid gap-2 d-md-block">
+	      {% if transaction.type == "EX" %}
+		<a href="{% url 'expenses:edit_expense' transaction_id=transaction.id %}" class="btn btn-primary">Edit</a>
+	      {% else %}
+		<a href="{% url 'expenses:edit_income' transaction_id=transaction.id %}" class="btn btn-primary">Edit</a>
+	      {% endif %}
+	      
+	      <a href="{% url 'expenses:delete' transaction_id=transaction.id %}" class="btn btn-danger">Delete</a>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+   const ctx = document.getElementById('expenses_pie_chart');
+   const labels = {{ category_labels | safe }};
+   const data = {{ category_data | safe}};
+
+   new Chart(ctx, {
+     type: 'pie',
+     data: {
+       labels: labels,
+       datasets: [{
+         label: 'Expense Dataset',
+         data: data,
+       }]
+     },
+     options: {
+       responsive: true,
+       plugins: {
+	 legend: {
+           position: 'left',
+	 }
+       }
+     }
+   });
+  </script>
 {% endblock %}
