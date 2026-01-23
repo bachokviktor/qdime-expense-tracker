@@ -1,4 +1,4 @@
-## Introduction
+## QDime: Expense Tracker
 
 QDime is an expense tracker system implemented using Django
 
